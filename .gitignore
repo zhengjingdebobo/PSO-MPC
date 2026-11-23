@@ -1,0 +1,45 @@
+# Existing local Python virtual environment
+.venv/
+venv/
+
+# Python bytecode and tool caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.pytest-tmp-*/
+.mypy_cache/
+.ruff_cache/
+
+# Test coverage reports
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Generated simulation images, animations, data and test reports
+/outputs/
+/outputs_*/
+
+# Python build artifacts
+build/
+dist/
+*.egg-info/
+
+# Local editor settings and temporary files
+.vscode/
+.idea/
+*.code-workspace
+*.log
+*.tmp
+*.bak
+~$*
+
+# Windows/macOS metadata
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Local environment settings (keep shareable examples)
+.env
+.env.*
+!.env.example
