@@ -31,7 +31,7 @@ pso_mpc_parking/
 ├── config/
 │   └── settings.py          # 在已有文件中增加算法参数配置
 ├── controllers/
-│   ├── objective.py         # 报告中的代价函数
+│   ├── objective.py         # 报告中的代价函数 已完成√
 │   ├── evaluator.py         # 轨迹预测、约束检查及候选解评价
 │   ├── pso.py               # 粒子群搜索
 │   └── mpc.py               # 调用 PSO，返回当前应执行的输入
@@ -41,4 +41,8 @@ pso_mpc_parking/
 └── main_pso_mpc.py           # 自动泊车实验入口
 
 ## 11.23
+上传至Github
 新建controllers/objective.py与tests/test_objective.py 主要负责实现代价函数与测试
+完成代价函数模块的编写
+### learning
+学习到了pytest，python测试工具，可以通过这个来测试所编写的模块函数是否正确
