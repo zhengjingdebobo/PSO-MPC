@@ -29,12 +29,12 @@ result = Simulator(model, checker, config).run(controls)
 ### 需要自建以及攥写的文件代码结构框架
 pso_mpc_parking/
 ├── config/
-│   └── settings.py          # 在已有文件中增加算法参数配置
+│   └── settings.py          # 在已有文件中增加算法参数配置 已完善√
 ├── controllers/
 │   ├── objective.py         # 报告中的代价函数 已完成√
 │   ├── evaluator.py         # 轨迹预测、约束检查及候选解评价 已完成√
-│   ├── pso.py               # 粒子群搜索
-│   └── mpc.py               # 调用 PSO，返回当前应执行的输入
+│   ├── pso.py               # 粒子群搜索   已完成√
+│   └── mpc.py               # 调用 PSO，返回当前应执行的输入   已完成√
 ├── simulation/
 │   ├── simulator.py         # 保留已有的预设输入仿真
 │   └── closed_loop.py       # 闭环推进、记录及终止判断
@@ -62,3 +62,9 @@ pso_mpc_parking/
 而且在写代码的时候总是会粗心，变量名搞错
 python和c的差别还是有的，在引用函数的时候一直漏掉最后一个
 模块化模块化 感觉现在只是把框架写出来了，到时候调参估计也是个大工作
+
+开始写mpc相关代码了，搞了好久Gemini的会员，结果还是没搞定，账号一直是中国香港，明天GPT就过期了！！！我也想用30的ai！！
+速写，快写
+
+已经完成各个模块的编写：objective实现代价函数计算，evaluate评价生成序列，pso进行随机粒子群生成，mpc调用最优序列并进行第一步，接下来就是整合循环执行接入仿真了 以为工作量很大的，但是每天写一点其实还好
+ai确实比我厉害多了，我还会有拼写错误，它直接写出来了 我30分钟的工作量它30s

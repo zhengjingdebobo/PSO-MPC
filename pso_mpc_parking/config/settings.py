@@ -139,3 +139,30 @@ class PSOConfig:
             ):
                 raise ValueError("random_seed必须为非负整数或None")
 
+@dataclass(frozen=True)
+class ClosedLoopConfig:
+    max_steps:int = 600
+    
+    position_tolerance: float = 0.15        # 后轴位置误差，m
+    heading_tolerance: float = 3 * pi / 180  # 航向误差，rad
+    speed_tolerance: float = 0.05           # 停车速度阈值，m/s
+    steering_tolerance: float = 3 * pi / 180  # 回正误差，rad
+
+    def __post_init__(self) -> None:
+        if (
+            isinstance(self.max_steps, bool)
+            or not isinstance(self.max_steps, int)
+            or self.max_steps <= 0
+        ):
+            raise ValueError("max_steps 必须为正整数")
+
+        for name in [
+            "position_tolerance",
+            "heading_tolerance",
+            "speed_tolerance",
+            "steering_tolerance",
+        ]:
+            value = getattr(self, name)
+
+            if not isfinite(value) or value <= 0:
+                raise ValueError(f"{name} 必须为有限正数")
