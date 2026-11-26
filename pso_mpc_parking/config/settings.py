@@ -83,3 +83,59 @@ class SimulationConfig:
             raise ValueError("initial_state must contain five finite values")
         if self.integration_method not in ("rk4", "euler"):
             raise ValueError("integration_method must be rk4 or euler")
+
+@dataclass(frozen=True)
+class PSOConfig:
+
+    horizon: int = 20 # 预测控制序列长度
+    particle_count: int = 20 # 粒子数量
+    max_iterations: int = 20 # 迭代次数
+
+    inertia_weight: float = 0.6 # 惯性权重
+    cognitive_weight: float = 1.5 # 个体认知权重
+    social_weight: float = 1.5 # 社会认知权重
+
+    # 约束条件
+    velocity_fraction: float = 0.2 # 粒子速度约束比例
+
+    random_seed: int | None = 0
+
+    def __post_init__(self) -> None:
+        for name in [
+            "horizon",
+            "particle_count",
+            "max_iterations",
+        ]:
+            value = getattr(self, name)
+
+            if(
+                isinstance(value, bool)
+                or not isinstance(value, int)
+                or value <= 0
+            ):
+                raise ValueError(f"{name} 必须为正整数")
+
+        for name in [
+            "inertia_weight",
+            "cognitive_weight",
+            "social_weight",
+        ]:
+            value = getattr(self, name)
+
+            if not isfinite(value) or value < 0:
+                raise ValueError(f"{name} 必须为非负有限数值")
+
+        if (
+            not isfinite(self.velocity_fraction)
+            or not 0 < self.velocity_fraction <=1
+        ):
+            raise ValueError("velocity_fraction必须为在 (0, 1]")
+
+        if self.random_seed is not None:
+            if(
+                isinstance(self.random_seed,bool)
+                or not isinstance(self.random_seed, int)
+                or self.random_seed < 0
+            ):
+                raise ValueError("random_seed必须为非负整数或None")
+
