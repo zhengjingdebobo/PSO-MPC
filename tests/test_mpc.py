@@ -180,6 +180,10 @@ def test_feedback_and_previous_input_are_forwarded(monkeypatch):
         calls[1]["previous_control"],
         first.control,
     )
+    np.testing.assert_array_equal(
+        calls[1]["warm_start"],
+        [[-0.3, -0.1], [-0.3, -0.1]],
+    )
 
 
 def test_failure_returns_no_control(monkeypatch):

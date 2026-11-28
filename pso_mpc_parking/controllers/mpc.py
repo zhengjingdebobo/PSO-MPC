@@ -35,6 +35,7 @@ class MPCController:
             self,
             previous_control: ArrayLike | None = None,
     ) -> None:
+        self._warm_start: NDArray[np.float64] | None = None
         control = (
             np.zeros(2)
             if previous_control is None
@@ -59,11 +60,14 @@ class MPCController:
         )
         reference = finite_vector(reference, 5,"reference")
 
-        optimization = self.optimizer.optimize(
+        optimizer_arguments = dict(
             initial_state= current_state,
             reference= reference,
             previous_control= self.previous_control,
         )
+        if self._warm_start is not None:
+            optimizer_arguments["warm_start"] = self._warm_start.copy()
+        optimization = self.optimizer.optimize(**optimizer_arguments)
 
         # 检测是否成功
         if not optimization.success:
@@ -110,6 +114,10 @@ class MPCController:
 
         if not np.array_equal(control, constrained):
              raise ValueError("PSO 返回的首个输入超出范围")
+
+        self._warm_start = np.concatenate(
+            [controls[1:], controls[-1:]], axis=0
+        ).copy()
 
         return MPCResult(
             success= True,

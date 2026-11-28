@@ -101,6 +101,28 @@ def test_search_returns_feasible_result():
     assert result.cost_history[-1] == pytest.approx(result.cost)
 
 
+def test_warm_start_is_used_as_first_particle(monkeypatch):
+    optimizer, evaluator, _ = make_optimizer()
+    warm_start = np.zeros((optimizer.config.horizon, 2))
+    original_evaluate = evaluator.evaluate
+    evaluated_controls = []
+
+    def capture_evaluate(**kwargs):
+        evaluated_controls.append(kwargs["controls"].copy())
+        return original_evaluate(**kwargs)
+
+    monkeypatch.setattr(evaluator, "evaluate", capture_evaluate)
+    result = optimizer.optimize(
+        initial_state=[0, 2, 0, 0, 0],
+        reference=[1, 2, 0, 0, 0],
+        previous_control=[0, 0],
+        warm_start=warm_start,
+    )
+
+    assert result.success
+    np.testing.assert_array_equal(evaluated_controls[0], warm_start)
+
+
 def test_same_seed_is_reproducible():
     """相同配置和种子，新建的两个优化器应产生相同结果。"""
     optimizer_a, _, _ = make_optimizer(seed=10)

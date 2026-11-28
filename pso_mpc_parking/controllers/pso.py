@@ -36,6 +36,7 @@ class PSOOptimizer:
             initial_state: ArrayLike,
             reference: ArrayLike,
             previous_control: ArrayLike,
+            warm_start: ArrayLike | None = None,
     ) ->PSOResult:
         initial_state = finite_vector(initial_state, 5, "initial_state")
         reference = finite_vector(reference, 5, "reference")
@@ -47,6 +48,18 @@ class PSOOptimizer:
         horizon = config.horizon
         particle_count = config.particle_count
         dimension = horizon * 2
+
+        initial_controls = None
+        if warm_start is not None:
+            initial_controls = np.asarray(warm_start, dtype=float)
+            if initial_controls.shape != (horizon, 2):
+                raise ValueError("warm_start must have shape (horizon, 2)")
+            if not np.all(np.isfinite(initial_controls)):
+                raise ValueError("warm_start must contain only finite values")
+            initial_controls = np.stack([
+                self.evaluator.model.constrain_control(control)
+                for control in initial_controls
+            ])
 
         # 单步变量为[v,w]，重复horizon次，设置上下限
         upper = np.tile(
@@ -78,6 +91,25 @@ class PSOOptimizer:
             return positions, velocities
 
         positions, velocities = sample_population()
+        if initial_controls is not None:
+            # Keep one particle at the shifted plan and seed nearby particles
+            # locally, while retaining the remaining global random particles.
+            warm_position = initial_controls.reshape(dimension)
+            positions[0] = warm_position
+            velocities[0] = 0.0
+            local_count = (particle_count - 1) // 2
+            if local_count:
+                local_scale = 0.1 * (upper - lower)
+                positions[1:1 + local_count] = np.clip(
+                    warm_position
+                    + self.rng.uniform(
+                        -local_scale,
+                        local_scale,
+                        size=(local_count, dimension),
+                    ),
+                    lower,
+                    upper,
+                )
         
         personal_best_positions = positions.copy()
         personal_best_costs = np.full(
